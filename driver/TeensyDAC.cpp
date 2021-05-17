@@ -56,6 +56,7 @@ MODULE_API void InitializeModuleData() {
 		desc += char('A' + i);
 		RegisterDevice(name.c_str(), MM::StageDevice, desc.c_str());
 	}
+#if defined(HAS_SHUTTERS)
 	for (int i = 0; i < MAX_NUM_SHUTTERS; i++) {
 		std::string name = g_deviceNameShutter;
 		std::string desc = g_deviceDescShutter;
@@ -64,6 +65,7 @@ MODULE_API void InitializeModuleData() {
 		desc += char('A' + i);
 		RegisterDevice(name.c_str(), MM::ShutterDevice, desc.c_str());
 	}
+#endif
 }
 
 /** Instantiate the named device. */
@@ -82,6 +84,7 @@ MODULE_API MM::Device* CreateDevice(const char* deviceName) {
 			return new TeensyDACGalvo(i);
 		}
 	}
+#if defined(HAS_SHUTTERS)
 	for (channel_t i = 0; i < MAX_NUM_SHUTTERS; i++) {
 		std::string name = g_deviceNameShutter;
 		name += char('A' + i);
@@ -89,6 +92,7 @@ MODULE_API MM::Device* CreateDevice(const char* deviceName) {
 			return new TeensyDACShutter(i);
 		}
 	}
+#endif
 	return nullptr;
 }
 
@@ -153,10 +157,12 @@ int TeensyDACHub::DetectInstalledDevices()
 		if (!dispatchGet(GET_NUM_GALVOS, numGalvos)) {
 			return ERR_COMMUNICATION;
 		}
+#if defined(HAS_SHUTTERS)
 		channel_t numShutters = 0;
 		if (!dispatchGet(GET_NUM_SHUTTERS, numShutters)) {
 			return ERR_COMMUNICATION;
 		}
+#endif
 		for (int i = 0; i < numGalvos; i++) {
 			std::string name = g_deviceNameGalvo;
 			name += char('A' + i);
@@ -165,6 +171,7 @@ int TeensyDACHub::DetectInstalledDevices()
 				AddInstalledDevice(pDev);
 			}
 		}
+#if defined(HAS_SHUTTERS)
 		for (int i = 0; i < numShutters; i++) {
 			std::string name = g_deviceNameShutter;
 			name += char('A' + i);
@@ -173,6 +180,7 @@ int TeensyDACHub::DetectInstalledDevices()
 				AddInstalledDevice(pDev);
 			}
 		}
+#endif
 	}
 
 	return DEVICE_OK;
@@ -274,9 +282,10 @@ int TeensyDACHub::Initialize() {
 		cmds = CommandSet::build().withGet(GET_NUM_GALVOS);
 		assertOK(numGalvos_.createRemoteProp(this, this, g_infoNumGalvos, cmds));
 
+#if defined(HAS_SHUTTERS)
 		cmds = CommandSet::build().withGet(GET_NUM_SHUTTERS);
 		assertOK(numShutters_.createRemoteProp(this, this, g_infoNumShutters, cmds));
-
+#endif
 
 	} catch (DeviceResultException deviceError) {
 		LogMessage(deviceError.format(this));
@@ -309,7 +318,9 @@ TeensyDACGalvo::TeensyDACGalvo(channel_t __chan) : chan_(__chan) {
 	initCommonErrors("Arduino", CURRENT_VERSION, [this](int err, const char* txt) {
 		SetErrorText(err, txt);
 	});
+#if defined(GALVOS_SEQUENCABLE)
 	posSequence_.clear();
+#endif
 }
 
 TeensyDACGalvo::~TeensyDACGalvo() {
@@ -333,14 +344,21 @@ int TeensyDACGalvo::Initialize() {
 	try {
 		CommandSet cmds = CommandSet::build();	// dummy to initialize
 
+#if defined(GALVOS_SEQUENCABLE)
 		cmds = CommandSet::build().withChan(chan_).withSet(GAL_SET_POS).withGet(GAL_GET_POS)
 			.withSetSeq(GAL_SETSEQ_POS).withGetSeq(GAL_GETSEQ_POS)
 			.withStartSeq(GAL_STARTSEQ_POS).withStopSeq(GAL_STOPSEQ_POS);
 		assertOK(pos_.createRemoteProp(this, hub, g_infoGalvoPosition, cmds));
-
-
 		cmds = CommandSet::build().withGet(GAL_GET_ARRAYSEQ_POS);
 		assertOK(posSeqRead_.createRemoteProp(this, hub, g_infoGalvoPosSeq, cmds));
+
+#else
+		cmds = CommandSet::build().withChan(chan_).withSet(GAL_SET_POS).withGet(GAL_GET_POS);
+		assertOK(pos_.createRemoteProp(this, hub, g_infoGalvoPosition, cmds));
+#endif
+
+		cmds = CommandSet::build().withChan(chan_).withSet(GAL_SET_FREQ).withGet(GAL_GET_FREQ);
+		assertOK(freq_.createRemoteProp(this, hub, g_infoGalvoFrequency, cmds));
 
 	} catch (DeviceResultException deviceError) {
 		LogMessage(deviceError.format(this));
@@ -415,7 +433,7 @@ int TeensyDACGalvo::GetLimits(double& lower, double& upper) {
 	return DEVICE_OK;
 }
 
-
+#if defined(GALVOS_SEQUENCABLE)
 int TeensyDACGalvo::GetStageSequenceMaxLength(long& nrEvents) const {
 	hprot::prot_size_t size;
 	int ret;
@@ -451,9 +469,11 @@ int TeensyDACGalvo::SendStageSequence() {
 	}
 	return DEVICE_OK;
 }
+#endif
 
 ///@}
 
+#if defined(HAS_SHUTTERS)
 
 //#############################################################################
 //### class TeensyDACShutter
@@ -537,5 +557,7 @@ int TeensyDACShutter::GetOpen(bool& __open) {
 	return DEVICE_OK;
 }
 ///@}
+
+#endif // HAS_SHUTTERS
 
 ///@}

@@ -1,0 +1,90 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{4C009FBC-EF23-485E-AD36-23EC34E75E6E}</ProjectGuid>
+    <RootNamespace>MMArduinoHProt</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\jrkuhn\Documents\Arduino\libraries\MMArduinoHProt\ArduinoCommon.h" />
+    <ClInclude Include="C:\Users\jrkuhn\Documents\Arduino\libraries\MMArduinoHProt\ArduinoDebugPrint.h" />
+    <ClInclude Include="C:\Users\jrkuhn\Documents\Arduino\libraries\MMArduinoHProt\ArduinoStreamHexProtocol.h" />
+    <ClInclude Include="C:\Users\jrkuhn\Documents\Arduino\libraries\MMArduinoHProt\ArduinoStringStream.h" />
+    <ClInclude Include="C:\Users\jrkuhn\Documents\Arduino\libraries\MMArduinoHProt\ArduinoUsbDebugPrint.h" />
+    <ClInclude Include="C:\Users\jrkuhn\Documents\Arduino\libraries\MMArduinoHProt\AsciiCodes.h" />
+    <ClInclude Include="C:\Users\jrkuhn\Documents\Arduino\libraries\MMArduinoHProt\DeviceCommon.h" />
+    <ClInclude Include="C:\Users\jrkuhn\Documents\Arduino\libraries\MMArduinoHProt\DeviceError.h" />
+    <ClInclude Include="C:\Users\jrkuhn\Documents\Arduino\libraries\MMArduinoHProt\DeviceHexProtocol.h" />
+    <ClInclude Include="C:\Users\jrkuhn\Documents\Arduino\libraries\MMArduinoHProt\DeviceProp.h" />
+    <ClInclude Include="C:\Users\jrkuhn\Documents\Arduino\libraries\MMArduinoHProt\DevicePropHelpers.h" />
+    <ClInclude Include="C:\Users\jrkuhn\Documents\Arduino\libraries\MMArduinoHProt\HexProtocol.h" />
+    <ClInclude Include="C:\Users\jrkuhn\Documents\Arduino\libraries\MMArduinoHProt\LocalProp.h" />
+    <ClInclude Include="C:\Users\jrkuhn\Documents\Arduino\libraries\MMArduinoHProt\RemoteProp.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="C:\Users\jrkuhn\Documents\Arduino\libraries\MMArduinoHProt\library.properties" />
+    <None Include="C:\Users\jrkuhn\Documents\Arduino\libraries\MMArduinoHProt\LICENSE" />
+    <None Include="C:\Users\jrkuhn\Documents\Arduino\libraries\MMArduinoHProt\README.md" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

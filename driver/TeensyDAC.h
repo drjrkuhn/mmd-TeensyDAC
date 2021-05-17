@@ -30,6 +30,8 @@
 #ifndef _TEENSYDAC_H_
 #define _TEENSYDAC_H_
 
+#define LOG_DEVICE_HEX_PROTOCOL
+
 #include "DeviceBase.h"
 #include "ImgBuffer.h"
 #include "DeviceThreads.h"
@@ -69,10 +71,12 @@ namespace tdac {
 	///@{
 	const char* g_deviceNameHub = "TeensyDAC-Hub";
 	const char* g_deviceDescHub = "KI TeensyDAC Hub";
-	const char* g_deviceNameGalvo = "TeensyDAC-ax";
+	const char* g_deviceNameGalvo = "TeensyDAC-Gal";
 	const char* g_deviceDescGalvo = "Galvo Axis";
-	const char* g_deviceNameShutter = "TeensyDAC-sh";
-	const char* g_deviceDescShutter = "Shutter";
+#if defined(HAS_SHUTTERS)
+	//const char* g_deviceNameShutter = "TeensyDAC-sh";
+	//const char* g_deviceDescShutter = "Shutter";
+#endif
 	//@}
 
 	////////////////////////////////////////////////////////////////
@@ -91,7 +95,9 @@ namespace tdac {
 	const auto g_infoRevision = PropInfo<version_t>::build("Firmware Revision", 0).assertReadOnly();
 	const auto g_infoIsAlive = PropInfo<::hprot::prot_bool_t>::build("Is Alive", false).assertReadOnly();
 	const auto g_infoNumGalvos = PropInfo<channel_t>::build("Number of Galvos", MAX_NUM_GALVOS);
+#if defined(HAS_SHUTTERS)
 	const auto g_infoNumShutters = PropInfo<channel_t>::build("Number of Shutters", MAX_NUM_SHUTTERS);
+#endif
 
 	///@}
 
@@ -99,9 +105,14 @@ namespace tdac {
 	/// \name PropInfo remote state property constants
 	/// \ingroup TeensyDAC
 	///@{
-	const auto g_infoGalvoPosition = PropInfo<position_t>::build("Pos", 0).withLimits(-10.0, 10.0);
+	const auto g_infoGalvoPosition = PropInfo<position_t>::build("PosV", 0).withLimits(-10.0, 10.0);
+	const auto g_infoGalvoFrequency = PropInfo<frequency_t>::build("FreqHz", 0).withLimits(0.0, 10000.0);
+#if defined(GALVOS_SEQUENCABLE)
 	const auto g_infoGalvoPosSeq = PropInfo<std::string>::build("Pos Sequence", "-").assertReadOnly();
+#endif
+#if defined(HAS_SHUTTERS)
 	const auto g_infoShutterOpen = PropInfo<::hprot::prot_bool_t>::build("Open", 0).withAllowedValues({ 0, 1 });
+#endif
 	///@}
 
 
@@ -181,7 +192,9 @@ namespace tdac {
 		RemoteReadOnlyProp<version_t, CLASS, HUB> firmwareRevision_;
 		RemoteReadOnlyProp<::hprot::prot_bool_t, CLASS, HUB> isAlive_;
 		RemoteReadOnlyProp<channel_t, CLASS, HUB> numGalvos_;
+#if defined(HAS_SHUTTERS)
 		RemoteReadOnlyProp<channel_t, CLASS, HUB> numShutters_;
+#endif
 		///@}
 
 	}; // class TeensyDACHub
@@ -211,7 +224,7 @@ namespace tdac {
 		//////////////////////////////////////////////////////////
 		///@{
 		void GetName(char* __name) const override {
-			::std::string name = g_deviceNameShutter;
+			::std::string name = g_deviceNameGalvo;
 			name += char('A' + chan_);
 			CDeviceUtils::CopyLimitedString(__name, name.c_str());
 		}
@@ -240,24 +253,39 @@ namespace tdac {
 		bool IsContinuousFocusDrive() const override { return false; }
 
 		// Sequence functions
-		int IsStageSequenceable(bool&) const override { return true; };
+		int IsStageSequenceable(bool&) const override { 
+#if defined(GALVOS_SEQUENCABLE)
+			return true;
+#else
+			return false;
+#endif
+		};
+#if defined(GALVOS_SEQUENCABLE)
 		int GetStageSequenceMaxLength(long& nrEvents) const override;
 		int StartStageSequence() override;
 		int StopStageSequence() override;
 		int ClearStageSequence() override;
 		int AddToStageSequence(double pos_um) override;
 		int SendStageSequence() override;
+#endif
 		///@}
 
 	protected:
 		channel_t	chan_;
+#if defined(GALVOS_SEQUENCABLE)
 		RemoteSequenceableProp<position_t, CLASS, HUB> pos_;
 		RemoteArrayProp<position_t, CLASS, HUB> posSeqRead_;
 		std::vector<std::string> posSequence_;
+#else
+		RemoteProp<position_t, CLASS, HUB> pos_;
+#endif
+		RemoteProp<frequency_t, CLASS, HUB> freq_;
+
 
 	}; // TeensyDACGalvo
 
 
+#if defined(HAS_SHUTTERS)
 	//#############################################################################
 	//### class TeensyDACShutter
 	//#############################################################################
@@ -305,6 +333,7 @@ namespace tdac {
 		channel_t	chan_;
 		RemoteProp<::hprot::prot_bool_t, CLASS, HUB> open_;
 	}; // TeensyDACShutter
+#endif // HAS_SHUTTERS
 
 }; // namespace tdac
 
