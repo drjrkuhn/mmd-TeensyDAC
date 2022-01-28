@@ -105,6 +105,7 @@ namespace tdac {
 	/// \name PropInfo remote state property constants
 	/// \ingroup TeensyDAC
 	///@{
+	const auto g_infoGalvoOffset = PropInfo<position_t>::build("OffV", 0).withLimits(-10.0, 10.0);
 	const auto g_infoGalvoPosition = PropInfo<position_t>::build("PosV", 0).withLimits(-10.0, 10.0);
 	const auto g_infoGalvoFrequency = PropInfo<frequency_t>::build("FreqHz", 0).withLimits(0.0, 10000.0);
 #if defined(GALVOS_SEQUENCABLE)
@@ -279,6 +280,7 @@ namespace tdac {
 #else
 		RemoteProp<position_t, CLASS, HUB> pos_;
 #endif
+		RemoteProp<position_t, CLASS, HUB> off_;
 		RemoteProp<frequency_t, CLASS, HUB> freq_;
 
 

@@ -77,8 +77,9 @@ class SineWaveform
     float frequency_;
     uint32_t phase_accumulator_;
     uint32_t phase_increment_;
-    int32_t magnitude_;
     int32_t offset_;
+    int32_t magnitude_;
+    int32_t position_;
     float voltage_;
 
  public:
@@ -89,8 +90,9 @@ class SineWaveform
         frequency_         = 0.0f;
         phase_accumulator_ = 0;
         phase_increment_   = 0;
-        magnitude_         = 0;
         offset_            = 0;
+        magnitude_         = 0;
+        position_          = 0;
         voltage_           = 0.0f;
     }
 
@@ -103,7 +105,7 @@ class SineWaveform
     {
         if (isConstant_)
         {
-            return dac.analogValueToVoltage(chan_, offset_);
+            return dac.analogValueToVoltage(chan_, position_);
         }
         else
         {
@@ -115,15 +117,25 @@ class SineWaveform
     {
         if (isConstant_)
         {
-            offset_    = dac.voltageToAnalogValue(chan_, voltage);
+            position_    = dac.voltageToAnalogValue(chan_, voltage);
             magnitude_ = 0;
         }
         else
         {
-            offset_    = dac.voltageToAnalogValue(chan_, 0.0f);
+            position_    = dac.voltageToAnalogValue(chan_, 0.0f);
             magnitude_ = 2*dac.voltageToAnalogValue(chan_, voltage);
         }
         voltage_ = voltage;
+    }
+
+    float getOffset()
+    {
+        return dac.analogValueToVoltage(chan_, offset_);
+    }
+
+    void setOffset(float offset)
+    {
+        offset_ = dac.voltageToAnalogValue(chan_, offset);
     }
 
     void setFrequency(float freqHz)
@@ -159,7 +171,7 @@ class SineWaveform
     {
         if (isConstant_)
         {
-            return offset_;
+            return position_ + offset_;
         }
         // FROM THE TEENSY AUDIO LIBRARY, synth_sine.cpp
         uint32_t index, scale;
@@ -176,10 +188,10 @@ class SineWaveform
         val2 *= scale;                              // y1 = y1 * ffffffff'ffffffff
         val1 *= 0x10000 - scale;                    // y0 = y0 * 1'00000000'00000000  - y0 * ffffffff'ffffffff
         //sum = y1*f + y0(1 - f)
-        output = multiply_32x32_rshift32(val1 + val2, magnitude_) + offset_;
+        output = multiply_32x32_rshift32(val1 + val2, magnitude_) + position_;
 
         phase_accumulator_ += phase_increment_;
-        return output;
+        return output + offset_;
     }
 };
 
@@ -270,6 +282,22 @@ class TeensyDACHandler : public ArduinoStreamHexProtocol<TeensyDACHandler>
         return true;
     }
 
+    bool doSetOffset(channel_t __chan, position_t __offset)
+    {
+        if (__chan >= g_numDacs)
+            return false;
+        g_dacOuts[__chan].setOffset(__offset);
+        return true;
+    }
+
+    bool doGetOffset(channel_t __chan, position_t& __offset)
+    {
+        if (__chan >= g_numDacs)
+            return false;
+        __offset = g_dacOuts[__chan].getOffset();
+        return true;
+    }
+
     bool doSetFrequency(channel_t __chan, frequency_t __freq)
     {
         if (__chan >= g_numDacs)
@@ -314,6 +342,12 @@ class TeensyDACHandler : public ArduinoStreamHexProtocol<TeensyDACHandler>
                 break;
             case GAL_GET_POS:
                 processChannelGet<position_t>(cmd, &TeensyDACHandler::doGetPosition);
+                break;
+            case GAL_SET_OFF:
+                processChannelSet<position_t>(cmd, &TeensyDACHandler::doSetOffset);
+                break;
+            case GAL_GET_OFF:
+                processChannelGet<position_t>(cmd, &TeensyDACHandler::doGetOffset);
                 break;
             case GAL_SET_FREQ:
                 processChannelSet<frequency_t>(cmd, &TeensyDACHandler::doSetFrequency);

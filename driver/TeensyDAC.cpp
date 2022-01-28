@@ -357,6 +357,9 @@ int TeensyDACGalvo::Initialize() {
 		assertOK(pos_.createRemoteProp(this, hub, g_infoGalvoPosition, cmds));
 #endif
 
+		cmds = CommandSet::build().withChan(chan_).withSet(GAL_SET_OFF).withGet(GAL_GET_OFF);
+		assertOK(off_.createRemoteProp(this, hub, g_infoGalvoOffset, cmds));
+
 		cmds = CommandSet::build().withChan(chan_).withSet(GAL_SET_FREQ).withGet(GAL_GET_FREQ);
 		assertOK(freq_.createRemoteProp(this, hub, g_infoGalvoFrequency, cmds));
 

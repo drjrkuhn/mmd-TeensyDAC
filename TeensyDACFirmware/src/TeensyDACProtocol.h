@@ -28,7 +28,7 @@ namespace tdac {
 	/** Github action version string **/
 	#define GIT_REVISION_STR	""
 	/** Default revision number if SVN_REVISION_STR is malformed*/
-    #define DEFAULT_REVISION	1013
+    #define DEFAULT_REVISION	1018
 
 	/** Deterine the revision number from the subversion auto-props string.
 	I have tried to make it as safe as possible. */
@@ -57,6 +57,8 @@ namespace tdac {
 #endif
 		GAL_SET_FREQ = 'q',
 		GAL_GET_FREQ = 'Q',
+		GAL_SET_OFF = 'o',
+		GAL_GET_OFF = 'O',
 #if HAS_SHUTTERS
 		// shutter commands
 		SH_SET_OPEN,
