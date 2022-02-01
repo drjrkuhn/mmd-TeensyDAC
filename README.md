@@ -1,2 +1,2 @@
 # mmd-TeensyDAC
-MicroManager Teensy DAC device driver
+MicroManager Teensy DAC device driver 1.0
